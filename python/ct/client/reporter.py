@@ -24,7 +24,7 @@ class PoolException(Exception):
 def _scan_der_cert(der_certs, checks):
     try:
         result = []
-        for log_index, der_cert in der_certs:
+        for log_index, der_cert, chain in der_certs:
             partial_result = []
             strict_failure = False
             try:
@@ -139,7 +139,7 @@ class CertificateReport(object):
         """Scans certificates in der form for all supported observations.
 
         Args:
-            der_certs: non empty array of (log_index, observations) tuples.
+            der_certs: non empty array of (log_index, der_cert, chain) tuples.
         """
         self._jobs.append(self._pool.apply_async(_scan_der_cert,
                                                  [der_certs, self.checks],

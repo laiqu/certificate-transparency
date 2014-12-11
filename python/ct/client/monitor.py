@@ -1,3 +1,4 @@
+import copy
 import gflags
 import logging
 
@@ -284,10 +285,15 @@ class Monitor(object):
             ts_entry = parsed_entry.merkle_leaf.timestamped_entry
             if ts_entry.entry_type == client_pb2.X509_ENTRY:
                 der_cert = ts_entry.asn1_cert
+                chain = parsed_entry.extra_data.certificate_chain
             else:
                 der_cert = (
                     parsed_entry.extra_data.precert_chain_entry.pre_certificate)
-            der_certs.append((entry_index, der_cert))
+                chain = parsed_entry.extra_data.precert_chain_entry.precertificate_chain
+            # TODO(laiqu) figure out why exactly protobuf returns weak reference
+            # here and maybe use something better than deepcopy.
+            chain = copy.deepcopy(chain)
+            der_certs.append((entry_index, der_cert, chain))
         self.__report.scan_der_certs(der_certs)
 
     class EntryConsumer(defer.Deferred):

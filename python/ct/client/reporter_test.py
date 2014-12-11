@@ -26,13 +26,13 @@ class CertificateReportTest(base_check_test.BaseCheckTest):
 
     def test_scan_der_cert_no_checks(self):
         report = reporter.CertificateReport([])
-        report.scan_der_certs([(0, STRICT_DER)])
+        report.scan_der_certs([(0, STRICT_DER, [])])
         result = report.report()
         self.assertEqual(len(sum(result.values(), [])), 0)
 
     def test_scan_der_cert_broken_cert(self):
         report = reporter.CertificateReport([])
-        report.scan_der_certs([(0, "asdf")])
+        report.scan_der_certs([(0, "asdf", [])])
         result = report.report()
         self.assertObservationIn(asn1.All(),
                       sum(result.values(), []))
@@ -40,7 +40,7 @@ class CertificateReportTest(base_check_test.BaseCheckTest):
 
     def test_scan_der_cert_check(self):
         report = reporter.CertificateReport([FakeCheck()])
-        report.scan_der_certs([(0, STRICT_DER)])
+        report.scan_der_certs([(0, STRICT_DER, [])])
         result = report.report()
         self.assertObservationIn(asn1.Strict("Boom!"),
                                  sum(result.values(), []))
@@ -48,7 +48,7 @@ class CertificateReportTest(base_check_test.BaseCheckTest):
 
     def test_scan_der_cert_check_non_strict(self):
         report = reporter.CertificateReport([FakeCheck()])
-        report.scan_der_certs([(0, NON_STRICT_DER)])
+        report.scan_der_certs([(0, NON_STRICT_DER, [])])
         result = report.report()
         # There should be FakeCheck and asn.1 strict parsing failure
         self.assertEqual(len(sum(result.values(), [])), 2)
